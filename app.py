@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 import random
 from datetime import datetime, timezone, timedelta
 
-# --- CONFIGURATION DE LA PAGE ---
+# --- 1. CONFIGURATION DE LA PAGE (OBLIGATOIREMENT EN PREMIER) ---
 st.set_page_config(
     page_title="OCP Fleet Supervision",
     page_icon="🚜",
@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- DESIGN & STYLE CSS (ÉLÉGANT & SOMBRE) ---
+# --- 2. DESIGN & STYLE CSS (ÉLÉGANT & SOMBRE PREMIUM) ---
 st.markdown("""
 <style>
     /* Fond global de l'application */
@@ -31,7 +31,7 @@ st.markdown("""
     
     /* Titres */
     h1, h2, h3 {
-        color: #f39c12 !important; /* Jaune OCP élégant, pas trop agressif */
+        color: #f39c12 !important; /* Jaune OCP élégant */
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         font-weight: 600 !important;
     }
@@ -62,17 +62,16 @@ st.markdown("""
 </style>
 """, unsafe_allowed_html=True)
 
-# --- BASE DE DONNÉES DE LA FLOTTE (BENGUERIR / GANTOUR) ---
+# --- 3. BASE DE DONNÉES DE LA FLOTTE ---
 if 'fleet_data' not in st.session_state:
     st.session_state.fleet_data = {
-        "CAT-785D-001": {"modele": "CAT 785D", "type": "Dumper Minier", "init_hours": 5968.0, "lat": 32.2215, "lon": -7.9285, "color": "#f39c12"},
-        "CAT-390F-002": {"modele": "CAT 390F", "type": "Pelle Hydraulique", "init_hours": 8420.5, "lat": 32.2260, "lon": -7.9320, "color": "#1abc9c"},
-        "CAT-992K-003": {"modele": "CAT 992K", "type": "Chargeuse sur Pneus", "init_hours": 12150.2, "lat": 32.2180, "lon": -7.9210, "color": "#3498db"},
-        "CAT-D10T-004": {"modele": "CAT D10T", "type": "Bulldozer", "init_hours": 3110.8, "lat": 32.2295, "lon": -7.9415, "color": "#9b59b6"},
-        "CAT-16M-005": {"modele": "CAT 16M", "type": "Niveleuse Motorisée", "init_hours": 4670.4, "lat": 32.2140, "lon": -7.9150, "color": "#e74c3c"}
+        "CAT-785D-001": {"modele": "CAT 785D", "type": "Dumper Minier", "init_hours": 5968.0, "lat": 32.2215, "lon": -7.9285},
+        "CAT-390F-002": {"modele": "CAT 390F", "type": "Pelle Hydraulique", "init_hours": 8420.5, "lat": 32.2260, "lon": -7.9320},
+        "CAT-992K-003": {"modele": "CAT 992K", "type": "Chargeuse sur Pneus", "init_hours": 12150.2, "lat": 32.2180, "lon": -7.9210},
+        "CAT-D10T-004": {"modele": "CAT D10T", "type": "Bulldozer", "init_hours": 3110.8, "lat": 32.2295, "lon": -7.9415},
+        "CAT-16M-005": {"modele": "CAT 16M", "type": "Niveleuse Motorisée", "init_hours": 4670.4, "lat": 32.2140, "lon": -7.9150}
     }
 
-# Catalogue étendu de codes défauts (DTC)
 DTC_CATALOG = [
     {"spn": 91, "fmi": 8, "description": "Capteur position pédale d'accélérateur – signal hors plage"},
     {"spn": 5246, "fmi": 0, "description": "Filtre à particules DPF – niveau de suie élevé"},
@@ -81,10 +80,8 @@ DTC_CATALOG = [
     {"spn": 100, "fmi": 1, "description": "Pression d'huile moteur – niveau bas détecté"}
 ]
 
-# --- BARRE LATÉRALE (SIDEBAR) ---
+# --- 4. BARRE LATÉRALE (SIDEBAR) ---
 st.sidebar.markdown("### ⚙️ PARAMÈTRES FLOTTE")
-
-# Choix de la machine par son ID unique
 asset_options = list(st.session_state.fleet_data.keys())
 selected_id = st.sidebar.selectbox("Sélectionner un engin :", asset_options)
 selected_asset = st.session_state.fleet_data[selected_id]
@@ -101,12 +98,12 @@ st.sidebar.info(f"""
 * **Type:** {selected_asset['type']}
 """)
 
-# --- EN-TÊTE PRINCIPAL ---
+# --- 5. EN-TÊTE PRINCIPAL ---
 st.title("🚜 SUPERVISION FLOTTE CATERPILLAR – OCP BENGUERIR / GANTOUR")
 st.caption("Données télémétriques de l'interface VisionLink API — Système embarqué J1939 — PFE Génie Mécatronique")
 st.markdown("---")
 
-# --- SIMULATION DES VALEURS COURANTES ---
+# --- 6. SIMULATION DES VALEURS ---
 if btn_refresh:
     fuel_level = random.uniform(45.0, 64.7)
     engine_temp = random.uniform(88.0, 94.5)
@@ -118,7 +115,7 @@ else:
     engine_rpm = 1816
     dtc_count = 3
 
-# --- 1. INDICATEURS TEMPS RÉEL (METRICS) ---
+# --- 7. INDICATEURS TEMPS RÉEL ---
 st.markdown("### 📊 INDICATEURS TEMPS RÉEL")
 m_col1, m_col2, m_col3, m_col4, m_col5 = st.columns(5)
 
@@ -135,7 +132,7 @@ with m_col5:
 
 st.markdown("---")
 
-# --- 2. JAUGES DE SURVEILLANCE (GAUGES) ---
+# --- 8. JAUGES DE SURVEILLANCE ---
 st.markdown("### 🧭 JAUGES DE SURVEILLANCE")
 g_col1, g_col2 = st.columns(2)
 
@@ -171,7 +168,7 @@ with g_col2:
 
 st.markdown("---")
 
-# --- 3. ÉVOLUTION TEMPORELLE (COURBES SIMULÉES SUR 24H) ---
+# --- 9. ÉVOLUTION TEMPORELLE (COURBES SIMULÉES) ---
 st.markdown("### 📈 ÉVOLUTION TEMPORELLE")
 c_col1, c_col2 = st.columns(2)
 
@@ -213,7 +210,7 @@ with c_col4:
 
 st.markdown("---")
 
-# --- 4. CODES DÉFAUTS ACTIFS (DTC) ---
+# --- 10. CODES DÉFAUTS ACTIFS ---
 st.markdown("### ⚠️ CODES DÉFAUTS ACTIFS (DTC)")
 if dtc_count > 0:
     active_dtcs = DTC_CATALOG[:dtc_count]
@@ -226,7 +223,7 @@ else:
 
 st.markdown("---")
 
-# --- 5. GÉOLOCALISATION DE LA FLOTTE ---
+# --- 11. GÉOLOCALISATION ---
 st.markdown("### 🗺️ GÉOLOCALISATION DE LA FLOTTE - SITE BENGUERIR")
 df_map_list = []
 for k, v in st.session_state.fleet_data.items():
@@ -238,7 +235,6 @@ for k, v in st.session_state.fleet_data.items():
         "longitude": v["lon"] + (random.uniform(-0.002, 0.002) if btn_refresh else 0),
     })
 df_map = pd.DataFrame(df_map_list)
-
 st.map(df_map, latitude="latitude", longitude="longitude", size=40, zoom=13)
 
 with st.expander("📂 Tableau des positions GPS"):
@@ -246,7 +242,7 @@ with st.expander("📂 Tableau des positions GPS"):
 
 st.markdown("---")
 
-# --- 6. STATISTIQUES GLOBALES DE LA FLOTTE ---
+# --- 12. STATISTIQUES GLOBALES ---
 st.markdown("### 📊 STATISTIQUES GLOBALES DE LA FLOTTE")
 st_col1, st_col2 = st.columns(2)
 
@@ -272,4 +268,4 @@ with st_col2:
     st.plotly_chart(fig_scat, use_container_width=True)
 
 st.markdown("---")
-st.caption("OCP Benguerir / Gantour • Service Électronique — Dashboard de Démonstration Réseau Connecté")
+st.caption("OCP Benguerir / Gantour • Service Électronique — Dashboard de Supervision")
