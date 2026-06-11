@@ -23,19 +23,19 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Style CSS pour l'anâqa et le design sombre premium (Couleurs OCP)
+# Style CSS — CORRECTION : suppression du sélecteur "~" invalide sous Python 3.14
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap');
-    html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
+    html, body { font-family: 'Inter', sans-serif; }
     .stApp { background-color: #08121e; color: #e2e8f0; }
-    
+
     /* Style de la barre latérale */
     section[data-testid="stSidebar"] {
         background-color: #0c1928 !important;
         border-right: 1px solid #1e293b;
     }
-    
+
     .ocp-header {
         background: linear-gradient(135deg, #0a192f 0%, #0f2647 60%, #173b6c 100%);
         padding: 1.5rem 2rem;
@@ -45,14 +45,14 @@ st.markdown("""
         box-shadow: 0 4px 20px rgba(0,0,0,0.4);
     }
     .ocp-header h1 {
-        color: #f39c12 !important; /* Jaune OCP */
+        color: #f39c12 !important;
         font-family: 'IBM Plex Mono', monospace;
         font-size: 1.5rem;
         margin: 0;
         font-weight: 700;
     }
     .ocp-header p { color: #8892b0; margin: 5px 0 0 0; font-size: 0.88rem; }
-    
+
     /* Cartes de métriques personnalisées */
     div[data-testid="metric-container"] {
         background-color: #101f30;
@@ -61,15 +61,15 @@ st.markdown("""
         border-radius: 10px !important;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
     }
-    
-    h2 { 
-        color: #f39c12 !important; 
-        font-size: 1.2rem !important; 
-        text-transform: uppercase; 
+
+    h2 {
+        color: #f39c12 !important;
+        font-size: 1.2rem !important;
+        text-transform: uppercase;
         font-family: 'IBM Plex Mono', monospace;
         margin-top: 1.5rem !important;
     }
-    
+
     /* Bouton de simulation */
     div.stButton > button {
         background: linear-gradient(135deg, #f39c12, #d35400) !important;
@@ -85,7 +85,7 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
     }
 </style>
-""", unsafe_allowed_html=True)
+""", unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════
 # DATA CATALOGS (FLEET & DTC EXTENDED)
@@ -263,21 +263,21 @@ def is_db_empty() -> bool:
 # SECTION 3 — INITIALISATION HISTORIQUE
 # ══════════════════════════════════════════════════════════════════
 
-def populate_historical_data(nb_relevés: int = 72):
+def populate_historical_data(nb_releves: int = 72):
     conn = get_connection()
     assets = simulate_asset_list()
     now = datetime.now(timezone.utc)
 
     for asset in assets:
         upsert_engin(conn, asset)
-        for i in range(nb_relevés, 0, -1):
+        for i in range(nb_releves, 0, -1):
             ts = (now - timedelta(hours=i)).isoformat()
-            hours_offset = (nb_relevés - i) * random.uniform(0.8, 1.1)
+            hours_offset = (nb_releves - i) * random.uniform(0.8, 1.1)
             phase = random.choices(["travail", "ralenti", "arret"], weights=[0.65, 0.20, 0.15])[0]
 
             metrics = simulate_metrics(asset, hours_offset)
             status = simulate_status(asset, phase)
-            location = simulate_location(asset, time_offset_h=float(nb_relevés - i))
+            location = simulate_location(asset, time_offset_h=float(nb_releves - i))
 
             insert_telemetrie(conn, asset["assetId"], metrics, status, location, timestamp=ts)
 
@@ -300,7 +300,7 @@ def run_acquisition_cycle():
                 WHERE id_engin = ?
                 ORDER BY horodatage DESC LIMIT 1;
             """, (asset_id,)).fetchone()
-            
+
             last_hours = row[0] if row else asset["init_hours"]
             new_hours_diff = random.uniform(0.20, 0.28)
 
@@ -331,7 +331,7 @@ def query_db(sql: str, params: tuple = ()) -> pd.DataFrame:
 def bootstrap():
     init_database()
     if is_db_empty():
-        populate_historical_data(nb_relevés=72)
+        populate_historical_data(nb_releves=72)
     return True
 
 bootstrap()
@@ -344,7 +344,7 @@ st.markdown("""
     <h1>SUPERVISION FLOTTE CATERPILLAR — OCP BENGUERIR / GANTOUR</h1>
     <p>Données télémétriques VisionLink — Service Électronique OCP &nbsp;&nbsp;•&nbsp;&nbsp; PFE Génie Mécatronique</p>
 </div>
-""", unsafe_allowed_html=True)
+""", unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════
 # SIDEBAR BARRE LATÉRALE
@@ -423,8 +423,8 @@ def create_gauge(title, value, min_val, max_val, suffix, color):
             'bgcolor': '#101f30',
             'bordercolor': '#1e2a3a',
             'steps': [
-                {'range': [min_val, max_val*0.2], 'color': 'rgba(231, 76, 60, 0.1)'},
-                {'range': [max_val*0.2, max_val], 'color': 'rgba(46, 204, 113, 0.05)'}
+                {'range': [min_val, max_val * 0.2], 'color': 'rgba(231, 76, 60, 0.1)'},
+                {'range': [max_val * 0.2, max_val], 'color': 'rgba(46, 204, 113, 0.05)'}
             ]
         }
     ))
@@ -444,43 +444,43 @@ with gauge_col2:
 st.markdown("---")
 
 # ══════════════════════════════════════════════════════════════════
-# SECTION 3 — ÉVOLUTION TEMPORELLE (LES 4 GRAPHES DE LA VIDÉO)
+# SECTION 3 — ÉVOLUTION TEMPORELLE
 # ══════════════════════════════════════════════════════════════════
 st.markdown("## 📈 Évolution Temporelle (Historique Récent)")
 history_df = query_db("""
-    SELECT horodatage, heures_marche, temp_refroid, regime_moteur, niveau_carburant 
-    FROM telemetrie WHERE id_engin = ? 
+    SELECT horodatage, heures_marche, temp_refroid, regime_moteur, niveau_carburant
+    FROM telemetrie WHERE id_engin = ?
     ORDER BY horodatage ASC;
 """, (engin_selec,))
 
 if not history_df.empty:
     c_col1, c_col2 = st.columns(2)
-    
+
     with c_col1:
         fig_h = px.line(history_df, x="horodatage", y="heures_marche", title="Heures de Marche Cumulées (SMH)")
         fig_h.update_traces(line_color="#f39c12", line_width=2)
-        fig_h.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font_color='#a0aec0', height=250, margin=dict(t=40,b=20,l=20,r=20))
+        fig_h.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font_color='#a0aec0', height=250, margin=dict(t=40, b=20, l=20, r=20))
         st.plotly_chart(fig_h, use_container_width=True)
-        
+
     with c_col2:
         fig_t = px.line(history_df, x="horodatage", y="temp_refroid", title="Température Liquide de Refroidissement (°C)")
         fig_t.update_traces(line_color="#e74c3c", line_width=1.5)
         fig_t.add_hline(y=95, line_dash="dash", line_color="#c0392b", annotation_text="Seuil Alerte")
-        fig_t.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font_color='#a0aec0', height=250, margin=dict(t=40,b=20,l=20,r=20))
+        fig_t.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font_color='#a0aec0', height=250, margin=dict(t=40, b=20, l=20, r=20))
         st.plotly_chart(fig_t, use_container_width=True)
 
     c_col3, c_col4 = st.columns(2)
-    
+
     with c_col3:
         fig_r = px.line(history_df, x="horodatage", y="regime_moteur", title="Régime Moteur (RPM)")
         fig_r.update_traces(line_color="#2ecc71", line_width=1.5)
-        fig_r.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font_color='#a0aec0', height=250, margin=dict(t=40,b=20,l=20,r=20))
+        fig_r.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font_color='#a0aec0', height=250, margin=dict(t=40, b=20, l=20, r=20))
         st.plotly_chart(fig_r, use_container_width=True)
-        
+
     with c_col4:
         fig_f = px.line(history_df, x="horodatage", y="niveau_carburant", title="Évolution Niveau Carburant (%)")
         fig_f.update_traces(line_color="#3498db", line_width=2)
-        fig_f.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font_color='#a0aec0', height=250, margin=dict(t=40,b=20,l=20,r=20))
+        fig_f.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font_color='#a0aec0', height=250, margin=dict(t=40, b=20, l=20, r=20))
         st.plotly_chart(fig_f, use_container_width=True)
 else:
     st.info("Historique insuffisant pour générer les graphiques.")
@@ -501,7 +501,7 @@ else:
 st.markdown("---")
 
 # ══════════════════════════════════════════════════════════════════
-# SECTION 5 — GÉOLOCALISATION & MAP DE LA VIDÉO
+# SECTION 5 — GÉOLOCALISATION
 # ══════════════════════════════════════════════════════════════════
 st.markdown("## 🗺️ Géolocalisation de la Flotte - Site Benguerir")
 map_data = query_db("""
@@ -513,8 +513,7 @@ map_data = query_db("""
 
 if not map_data.empty:
     st.map(map_data, latitude="latitude", longitude="longitude", size=40, zoom=13)
-    
-    # Tableau extensible sous la carte exact comme la vidéo
+
     with st.expander("📂 Tableau des positions GPS complètes"):
         st.dataframe(map_data, use_container_width=True, hide_index=True)
 else:
@@ -523,7 +522,7 @@ else:
 st.markdown("---")
 
 # ══════════════════════════════════════════════════════════════════
-# SECTION 6 — STATISTIQUES GLOBALES DE LA FLOTTE (BARS & SCATTER)
+# SECTION 6 — STATISTIQUES GLOBALES DE LA FLOTTE
 # ══════════════════════════════════════════════════════════════════
 st.markdown("## 📊 Statistiques Globales de la Flotte")
 stats_col1, stats_col2 = st.columns(2)
@@ -538,15 +537,15 @@ global_df = query_db("""
 with stats_col1:
     if not global_df.empty:
         fig_bar = px.bar(global_df, x="modele", y="heures_marche", color="type_engin", title="Heures de Marche Totales par Engin (SMH)")
-        fig_bar.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font_color='#a0aec0', height=300, margin=dict(t=40,b=20,l=20,r=20))
+        fig_bar.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font_color='#a0aec0', height=300, margin=dict(t=40, b=20, l=20, r=20))
         st.plotly_chart(fig_bar, use_container_width=True)
 
 with stats_col2:
     if not global_df.empty:
-        fig_scat = px.scatter(global_df, x="temp_refroid", y="niveau_carburant", text="modele", color="type_engin", size=[30]*len(global_df), title="Analyse Température vs Niveau Carburant Actuel")
-        fig_scat.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font_color='#a0aec0', height=300, margin=dict(t=40,b=20,l=20,r=20))
+        fig_scat = px.scatter(global_df, x="temp_refroid", y="niveau_carburant", text="modele", color="type_engin", size=[30] * len(global_df), title="Analyse Température vs Niveau Carburant Actuel")
+        fig_scat.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font_color='#a0aec0', height=300, margin=dict(t=40, b=20, l=20, r=20))
         st.plotly_chart(fig_scat, use_container_width=True)
 
-# Pied de page (Footer)
+# Pied de page
 st.markdown("---")
 st.caption("OCP Benguerir / Gantour • Service Électronique — Dashboard de Supervision")
