@@ -107,7 +107,6 @@ st.caption("Données télémétriques de l'interface VisionLink API — Système
 st.markdown("---")
 
 # --- SIMULATION DES VALEURS COURANTES ---
-# Génération de valeurs réalistes mais propres
 if btn_refresh:
     fuel_level = random.uniform(45.0, 64.7)
     engine_temp = random.uniform(88.0, 94.5)
@@ -176,11 +175,9 @@ st.markdown("---")
 st.markdown("### 📈 ÉVOLUTION TEMPORELLE")
 c_col1, c_col2 = st.columns(2)
 
-# Abscisse temporelle
 times = [datetime.now(timezone.utc) - timedelta(minutes=30*i) for i in range(24, 0, -1)]
 
 with c_col1:
-    # Courbe des Heures
     hours_series = [selected_asset['init_hours'] - (24-i)*0.4 for i in range(24)]
     df_hours = pd.DataFrame({"Temps": times, "Heures": hours_series})
     fig_h = px.line(df_hours, x="Temps", y="Heures", title="Heures de Marche Cumulées (SMH)")
@@ -189,17 +186,14 @@ with c_col1:
     st.plotly_chart(fig_h, use_container_width=True)
 
 with c_col2:
-    # Courbe de Température
     temp_series = [engine_temp + random.uniform(-4, 4) for _ in range(24)]
     df_temp = pd.DataFrame({"Temps": times, "Temp": temp_series})
     fig_t = px.line(df_temp, x="Temps", y="Temp", title="Température Liquide de Refroidissement (°C)")
     fig_t.update_traces(line_color="#e74c3c", line_width=1.5)
-    # Seuil critique d'alerte (ligne horizontale rouge)
     fig_t.add_hline(y=105, line_dash="dash", line_color="#c0392b", annotation_text="Seuil alerte 105°C")
     fig_t.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font_color='#a0aec0', height=250)
     st.plotly_chart(fig_t, use_container_width=True)
 
-# Deuxième ligne de courbes
 c_col3, c_col4 = st.columns(2)
 with c_col3:
     rpm_series = [engine_rpm + random.randint(-150, 150) for _ in range(24)]
@@ -226,8 +220,6 @@ if dtc_count > 0:
     df_dtc = pd.DataFrame(active_dtcs)
     df_dtc["Horodatage"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     df_dtc["Statut"] = "ACTIF"
-    
-    # Affichage sous forme de tableau propre
     st.dataframe(df_dtc, use_container_width=True, hide_index=True)
 else:
     st.success("Aucun code défaut actif transmis par l'ECM.")
@@ -247,10 +239,8 @@ for k, v in st.session_state.fleet_data.items():
     })
 df_map = pd.DataFrame(df_map_list)
 
-# Carte intégrée Streamlit élégante
 st.map(df_map, latitude="latitude", longitude="longitude", size=40, zoom=13)
 
-# Expandable pour voir la structure tabulaire des positions (comme sur ta vidéo)
 with st.expander("📂 Tableau des positions GPS"):
     st.dataframe(df_map, use_container_width=True, hide_index=True)
 
@@ -261,7 +251,6 @@ st.markdown("### 📊 STATISTIQUES GLOBALES DE LA FLOTTE")
 st_col1, st_col2 = st.columns(2)
 
 with st_col1:
-    # Graphe en barres pour comparer les heures cumulées
     bar_data = pd.DataFrame({
         "Modèle": [v["modele"] for v in st.session_state.fleet_data.values()],
         "Heures cumulées": [v["init_hours"] for v in st.session_state.fleet_data.values()],
@@ -272,7 +261,6 @@ with st_col1:
     st.plotly_chart(fig_bar, use_container_width=True)
 
 with st_col2:
-    # Scatter plot pour croiser Température Moyenne vs Niveau Carburant Moyen
     scatter_data = pd.DataFrame({
         "Modèle": [v["modele"] for v in st.session_state.fleet_data.values()],
         "Temp. moyenne (°C)": [85, 89, 74, 91, 80],
@@ -283,6 +271,5 @@ with st_col2:
     fig_scat.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font_color='#a0aec0', height=300)
     st.plotly_chart(fig_scat, use_container_width=True)
 
-# Pied de page (Footer)
 st.markdown("---")
-st.centered_text = st.caption("OCP Benguerir / Gantour • Service Électronique — Dashboard de Démonstration Réseau Connecté — Données Simulées pour Validation")
+st.caption("OCP Benguerir / Gantour • Service Électronique — Dashboard de Démonstration Réseau Connecté")
