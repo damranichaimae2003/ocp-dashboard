@@ -59,7 +59,7 @@ ENGINS = {
 DTC_CATALOG = [
     {"spn": 91, "fmi": 8, "description": "Capteur position pédale d'accélérateur – signal hors plage"},
     {"spn": 100, "fmi": 1, "description": "Pression huile moteur faible – capteur dessous seuil critique"},
-    {"spn": 110, "fmi": 0, "description": "Température liquide refroidissement moteur – seuil haut dépassé"},
+    {"st.markdown": 110, "fmi": 0, "description": "Température liquide refroidissement moteur – seuil haut dépassé"},
     {"spn": 174, "fmi": 0, "description": "Température carburant moteur – seuil haut dépassé"},
     {"spn": 190, "fmi": 2, "description": "Vitesse moteur irrégulière – données erratiques"},
     {"spn": 629, "fmi": 12, "description": "ECM – défaillance matérielle interne"},
@@ -77,19 +77,6 @@ def simulate_metrics(asset: dict, hours_offset: float = 0.0) -> dict:
         "engineHours": asset["init_hours"] + hours_offset,
         "totalFuelUsed": asset["init_fuel_total"] + hours_offset * random.uniform(20, 30)
     }
-
-# --- INTERFACE UTILISATEUR STREAMLIT ---
-# CSS personnalisé pour un look industriel OCP sombre
-st.markdown("""
-<style>
-    .reportview-container { background: #071520; color: #FFFFFF; }
-    .sidebar .sidebar-content { background: #0b1e2d; }
-    h1, h2, h3 { color: #FFB300; }
-    .stButton>button { background-color: #FFB300; color: #071520; font-weight: bold; }
-    div[data-testid="stMetricValue"] { color: #FFFFFF; font-size: 28px; font-weight: bold; }
-    div[data-testid="stMetricLabel"] { color: #A0AEC0; }
-</style>
-""", unsafe_allowed_html=True)
 
 # Barre latérale - Sélection de l'engin
 st.sidebar.markdown("# ⚙️ PARAMÈTRES")
@@ -140,7 +127,6 @@ col_map, col_graph = st.columns([1, 1])
 
 with col_map:
     st.markdown("### 🗺️ LOCALISATION GPS EN DIRECT")
-    # Création d'une carte centrée sur la mine de Benguerir
     df_map = pd.DataFrame([{
         'lat': asset_data['lat'] + random.uniform(-0.001, 0.001),
         'lon': asset_data['lon'] + random.uniform(-0.001, 0.001),
@@ -150,13 +136,12 @@ with col_map:
 
 with col_graph:
     st.markdown("### 📈 CONSOMMATION ET HISTORIQUE (24H)")
-    # Simulation des données historiques pour les graphes
     times = [datetime.now(timezone.utc) - timedelta(hours=i) for i in range(24, 0, -1)]
     fuel_history = [metrics['totalFuelUsed'] - (24-i)*random.uniform(22, 28) for i in range(24)]
     
     df_hist = pd.DataFrame({"Temps": times, "Carburant Total (L)": fuel_history})
     fig_fuel = px.line(df_hist, x="Temps", y="Carburant Total (L)", title="Évolution de la consommation globale")
-    fig_fuel.update_layout(paper_bgcolor='#071520', plot_bgcolor='#071520', font_color='#FFFFFF', height=350)
+    fig_fuel.update_layout(font_color='#FFFFFF', height=350)
     st.plotly_chart(fig_fuel, use_container_width=True)
 
 # Affichage des pannes DTC si existantes
