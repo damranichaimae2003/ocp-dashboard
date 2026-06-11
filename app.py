@@ -350,7 +350,7 @@ st.markdown("""
 # SIDEBAR BARRE LATÉRALE
 # ══════════════════════════════════════════════════════════════════
 with st.sidebar:
-    st.markdown("## ⚙️ Paramètres")
+    st.markdown("##  Paramètres")
     engins_df = query_db("SELECT id_engin, modele, type_engin FROM engins ORDER BY id_engin;")
 
     if engins_df.empty:
@@ -365,8 +365,8 @@ with st.sidebar:
     )
 
     st.markdown("---")
-    st.markdown("### 🛰️ Acquisition")
-    if st.button("📡 Simuler une remontée 4G"):
+    st.markdown("###  Acquisition")
+    if st.button(" Simuler une remontée 4G"):
         with st.spinner("Interrogation VisionLink..."):
             run_acquisition_cycle()
         st.success("Remontée 4G effectuée !")
@@ -394,13 +394,13 @@ lr = last_releve.iloc[0]
 # ══════════════════════════════════════════════════════════════════
 # SECTION 1 — KPI TEMPS RÉEL
 # ══════════════════════════════════════════════════════════════════
-st.markdown("## 📊 Indicateurs Temps Réel")
+st.markdown("##  Indicateurs Temps Réel")
 col1, col2, col3, col4, col5 = st.columns(5)
 
-col1.metric("Heures de marche", f"{lr['heures_marche']:.1f} h", "⚡ Cumulées (SMH)")
-col2.metric("Temp. Refroidissement", f"{lr['temp_refroid']:.1f} °C", "✓ Normal" if lr['temp_refroid'] < 95 else "⚠️ Alerte Seuil")
+col1.metric("Heures de marche", f"{lr['heures_marche']:.1f} h", " Cumulées (SMH)")
+col2.metric("Temp. Refroidissement", f"{lr['temp_refroid']:.1f} °C", " Normal" if lr['temp_refroid'] < 95 else " Alerte Seuil")
 col3.metric("Régime Moteur", f"{int(lr['regime_moteur'])} RPM", "En Charge")
-col4.metric("Niveau Carburant", f"{lr['niveau_carburant']:.1f} %", "⛽ OK")
+col4.metric("Niveau Carburant", f"{lr['niveau_carburant']:.1f} %", " OK")
 col5.metric("DTC Actifs", int(nb_dtc), "Codes défauts")
 
 st.markdown("---")
@@ -408,7 +408,7 @@ st.markdown("---")
 # ══════════════════════════════════════════════════════════════════
 # SECTION 2 — JAUGES DE SURVEILLANCE
 # ══════════════════════════════════════════════════════════════════
-st.markdown("## 🌡️ Jauges de Surveillance")
+st.markdown("##  Jauges de Surveillance")
 gauge_col1, gauge_col2 = st.columns(2)
 
 def create_gauge(title, value, min_val, max_val, suffix, color):
@@ -446,7 +446,7 @@ st.markdown("---")
 # ══════════════════════════════════════════════════════════════════
 # SECTION 3 — ÉVOLUTION TEMPORELLE
 # ══════════════════════════════════════════════════════════════════
-st.markdown("## 📈 Évolution Temporelle (Historique Récent)")
+st.markdown("##  Évolution Temporelle (Historique Récent)")
 history_df = query_db("""
     SELECT horodatage, heures_marche, temp_refroid, regime_moteur, niveau_carburant
     FROM telemetrie WHERE id_engin = ?
@@ -490,7 +490,7 @@ st.markdown("---")
 # ══════════════════════════════════════════════════════════════════
 # SECTION 4 — CODES DÉFAUTS ACTIFS (DTC)
 # ══════════════════════════════════════════════════════════════════
-st.markdown("## ⚠️ Codes Défauts Actifs (DTC)")
+st.markdown("##  Codes Défauts Actifs (DTC)")
 dtc_df = query_db("SELECT spn, fmi, description, horodatage, statut FROM codes_defauts WHERE id_engin = ? ORDER BY horodatage DESC;", (engin_selec,))
 
 if not dtc_df.empty:
@@ -503,7 +503,7 @@ st.markdown("---")
 # ══════════════════════════════════════════════════════════════════
 # SECTION 5 — GÉOLOCALISATION
 # ══════════════════════════════════════════════════════════════════
-st.markdown("## 🗺️ Géolocalisation de la Flotte - Site Benguerir")
+st.markdown("##  Géolocalisation de la Flotte - Site Benguerir")
 map_data = query_db("""
     SELECT t.id_engin, e.modele, e.type_engin, t.latitude, t.longitude
     FROM telemetrie t
@@ -514,7 +514,7 @@ map_data = query_db("""
 if not map_data.empty:
     st.map(map_data, latitude="latitude", longitude="longitude", size=40, zoom=13)
 
-    with st.expander("📂 Tableau des positions GPS complètes"):
+    with st.expander(" Tableau des positions GPS complètes"):
         st.dataframe(map_data, use_container_width=True, hide_index=True)
 else:
     st.warning("Données GPS indisponibles.")
@@ -524,7 +524,7 @@ st.markdown("---")
 # ══════════════════════════════════════════════════════════════════
 # SECTION 6 — STATISTIQUES GLOBALES DE LA FLOTTE
 # ══════════════════════════════════════════════════════════════════
-st.markdown("## 📊 Statistiques Globales de la Flotte")
+st.markdown("##  Statistiques Globales de la Flotte")
 stats_col1, stats_col2 = st.columns(2)
 
 global_df = query_db("""
