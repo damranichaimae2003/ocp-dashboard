@@ -476,6 +476,5 @@ with gauge_col1:
         title={'text': "Niveau Carburant (%)", 'font': {'color': '#A8D8F0', 'size': 14}},
         gauge={'axis': {'range': [0, 100]}, 'bar': {'color': '#2980b9'}, 'bgcolor': '#0F1C28'}
     ))
-    fig_fuel.update_layout(paper_bgcolor='#071520', height
-
+    fig_fuel.update_layout(paper_bgcolor='#071520', height=350)
 
