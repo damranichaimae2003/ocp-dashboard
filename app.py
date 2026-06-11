@@ -87,7 +87,7 @@ DTC_CATALOG = [
     {"spn" : 190,  "fmi" : 2,  "description" : "Vitesse moteur irrégulière — données erratiques"},
     {"spn" : 629,  "fmi" : 12, "description" : "ECM — défaillance matérielle interne"},
     {"spn" : 1569, "fmi" : 31, "description" : "Derate moteur actif — protection thermique engagée"},
-    {"spn" : 3216, "fmi" : 16, "description" : "NOx en sortie SCR — niveau élevé (post-traitement")},
+    {"spn" : 3216, "fmi" : 16, "description" : "NOx en sortie SCR — niveau élevé (post-traitement)"},
     {"spn" : 5246, "fmi" : 0,  "description" : "Filtre à particules DPF — niveau de suie élevé"},
     {"spn" : 641,  "fmi" : 5,  "description" : "Actionneur vanne turbo (VGT) — circuit ouvert"},
 ]
