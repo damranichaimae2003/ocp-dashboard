@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 # ──────────────────────────────────────────────────────────────────
 FLEET_CATALOG = [
     {
-        assetId      CAT-785D-001,
+        "assetId" :      "CAT-785D-001",
         serialNumber SN-OCP-001,
         model        CAT 785D,
         assetType    Dumper Minier,
